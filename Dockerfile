@@ -1,5 +1,5 @@
 # Use an official PHP runtime as a parent image
-FROM php:8.1-cli
+FROM php:8.2-cli
 
 # Install system dependencies, SQLite extension, and Composer
 RUN apt-get update && apt-get install -y \
