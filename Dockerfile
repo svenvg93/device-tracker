@@ -16,7 +16,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Install dependencies and generate autoload files
-RUN composer install --no-interaction --optimize-autoloader --no-scripts
+RUN composer install --no-interaction --optimize-autoloader --no-scripts --ignore-platform-reqs
 
 # Set permissions for Laravel storage and cache directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
