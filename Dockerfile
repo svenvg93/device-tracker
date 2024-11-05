@@ -4,9 +4,9 @@ FROM php:8.1-cli
 # Install system dependencies, SQLite extension, and Composer
 RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
+    unzip \
     && docker-php-ext-install pdo_sqlite \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && unzip \
     && docker-php-ext-install pdo_sqlite
 
 # Set the working directory
