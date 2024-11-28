@@ -8,7 +8,6 @@ use App\Filament\Widgets\GatewayDistributionChartWidget;
 use App\Filament\Widgets\GatewayWeeklyChartWidget;
 use App\Forms\Components\DateFilterForm;
 use App\Models\DeviceModels;
-use App\Models\Network;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -43,10 +42,11 @@ class Dashboard extends BaseDashboard
                         }),
                     Select::make('device_network')
                         ->label('Network')
-                        ->options(
-                            Network::pluck('name', 'id')->toArray() // Fetch device names as options
-                        )
-                        ->searchable()
+                        ->options([
+                            'B2C' => 'B2C',
+                            'B2B' => 'B2B',
+                        ])
+                        ->native(false)
                         ->required(),
                     TextInput::make('device_amount')
                         ->label('Amount')

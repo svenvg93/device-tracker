@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DeviceModelsResource\Pages;
 use App\Models\DeviceModels;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Tables;
 
@@ -33,13 +34,14 @@ class DeviceModelsResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('device_name')
                 ->required(),
-            Forms\Components\TextInput::make('device_type')
+            Select::make('device_type')
                 ->label('Device Type')
-                ->datalist([
-                    'Gateway',
-                    'Access Points',
-                    'Media Converter',
+                ->options([
+                    'Gateway' => 'Gateway',
+                    'Access Points' => 'Access Points',
+                    'Media Converter' => 'Media Converter',
                 ])
+                ->native(false)
                 ->required(),
             Forms\Components\ColorPicker::make('color') // Use ColorPicker instead of TextInput
                 ->required()

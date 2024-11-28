@@ -6,7 +6,6 @@ use App\Filament\Resources\DeviceCounterResource\Pages;
 use App\Models\DeviceCounter;
 use App\Models\DeviceModels;
 use App\Models\DeviceType;
-use App\Models\Network;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -21,6 +20,8 @@ class DeviceCounterResource extends Resource
     protected static ?string $model = DeviceCounter::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-hashtag';
+
+    protected static ?string $navigationGroup = 'Data';
 
     protected static ?string $navigationLabel = 'Device Count Registration';
 
@@ -59,9 +60,11 @@ class DeviceCounterResource extends Resource
                     ->required(),
                 Select::make('device_network')
                     ->label('Network')
-                    ->options(
-                        Network::pluck('name', 'name')->toArray())
-                    ->searchable()
+                    ->options([
+                        'B2C' => 'B2C',
+                        'B2B' => 'B2B',
+                    ])
+                    ->native(false)
                     ->required(),
                 DatePicker::make('current_date')
                     ->label('Current Date')

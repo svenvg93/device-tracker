@@ -40,6 +40,9 @@ class GatewayDistributionChartWidget extends ChartWidget
             'backgroundColor' => $deviceAmounts->map(function ($amount, $deviceName) use ($deviceColors) {
                 return $deviceColors[$deviceName] ?? '#000000'; // Default color if not found
             })->values()->toArray(),
+            'borderColor' => $deviceAmounts->map(function ($amount, $deviceName) use ($deviceColors) {
+                return $deviceColors[$deviceName] ?? '#000000'; // Default color if not found
+            })->values()->toArray(),
         ];
 
         // Prepare labels

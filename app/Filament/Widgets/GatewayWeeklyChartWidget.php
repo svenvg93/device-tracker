@@ -32,6 +32,7 @@ class GatewayWeeklyChartWidget extends ChartWidget
         // Fetch data with filtering based on the startDate and endDate
         $deviceAmounts = DeviceCounter::query()
             ->where('device_type', 'Gateway')
+            ->where('device_network', 'B2C')
             ->whereBetween('current_date', [$startDate, $endDate])
             ->get()
             ->groupBy('device_name') // Group by device_name
