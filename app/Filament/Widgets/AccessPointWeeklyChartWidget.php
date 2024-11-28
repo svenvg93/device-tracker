@@ -22,7 +22,7 @@ class AccessPointWeeklyChartWidget extends ChartWidget
     protected function getData(): array
     {
         // Ensure that startDate and endDate are passed as filters, falling back to defaults
-        $startDate = $this->filters['startDate'] ?? now()->subYear();
+        $startDate = $this->filters['startDate'] ?? now()->subWeek();
         $endDate = $this->filters['endDate'] ?? now();
 
         // Convert dates to the correct timezone without resetting the time
