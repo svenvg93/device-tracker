@@ -8,24 +8,23 @@ use Filament\Widgets\ChartWidget;
 
 class GatewayDistributionChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Current Gateway Distribution';
+    protected static ?string $heading = 'Latest Gateway Distribution';
 
     protected int|string|array $columnSpan = 'half';
 
-    protected static ?string $maxHeight = '300px';
+    protected static ?string $maxHeight = '250px';
 
     protected function getData(): array
     {
         // Get the last record for each device type
         $latestDevices = DeviceCounter::query()
             ->where('device_type', 'Gateway')
-            ->where('created_at', '>=', now()->subMonths(6))
             ->latest('created_at') // Order by the created_at timestamp
             ->get()
-            ->unique('name'); // Ensure only the last record per device name
+            ->unique('device_name'); // Ensure only the last record per device name
 
         // Map to get the amounts for the latest devices
-        $deviceAmounts = $latestDevices->pluck('amount', 'name'); // Adjust 'amount' if necessary
+        $deviceAmounts = $latestDevices->pluck('device_amount', 'device_name'); // Adjust 'amount' if necessary
 
         // Fetch colors for each device name from the DeviceColor model
         $deviceColors = DeviceModels::all()->pluck('color', 'device_name')->toArray();

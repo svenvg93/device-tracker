@@ -19,7 +19,7 @@ class CreateDevicesCounterTable extends Migration
             $table->string('device_type'); // Predefined device type (e.g., Mobile, Tablet)
             $table->string('device_network'); // Predefined network (e.g., WiFi, Ethernet)
             $table->date('current_date')->nullable(); // Adjust as needed
-            $table->integer('amount')->default(0); // Amount of devices for the week
+            $table->integer('device_amount')->default(0); // Amount of devices for the week
             $table->timestamps();
         });
     }

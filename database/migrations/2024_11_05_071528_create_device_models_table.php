@@ -11,6 +11,7 @@ class CreateDeviceModelsTable extends Migration
         Schema::create('device_models', function (Blueprint $table) {
             $table->id();
             $table->string('device_name')->unique(); // Unique device name
+            $table->string('device_type'); // Unique device name
             $table->string('color'); // Color hex code
             $table->timestamps();
         });

@@ -8,24 +8,23 @@ use Filament\Widgets\ChartWidget;
 
 class AcessPointDistributionChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Current Access Point Distribution';
+    protected static ?string $heading = 'Latest Access Point Distribution';
 
     protected int|string|array $columnSpan = 'half';
 
-    protected static ?string $maxHeight = '300px';
+    protected static ?string $maxHeight = '250px';
 
     protected function getData(): array
     {
         // Get the last record for each device type
         $latestDevices = DeviceCounter::query()
-            ->where('device_type', 'Access Point')
-            ->where('created_at', '>=', now()->subMonths(6))
+            ->where('device_type', 'Access Points')
             ->latest('created_at') // Order by the created_at timestamp
             ->get()
-            ->unique('name'); // Ensure only the last record per device name
+            ->unique('device_name'); // Ensure only the last record per device name
 
         // Map to get the amounts for the latest devices
-        $deviceAmounts = $latestDevices->pluck('amount', 'name'); // Adjust 'amount' if necessary
+        $deviceAmounts = $latestDevices->pluck('device_amount', 'device_name'); // Adjust 'amount' if necessary
 
         // Fetch colors for each device name from the DeviceColor model
         $deviceColors = DeviceModels::all()->pluck('color', 'device_name')->toArray();

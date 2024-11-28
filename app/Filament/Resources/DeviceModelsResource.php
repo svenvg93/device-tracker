@@ -18,16 +18,33 @@ class DeviceModelsResource extends Resource
 
     protected static ?string $navigationGroup = 'Data';
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->is_admin;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()->is_admin;
+    }
+
     public static function form(Forms\Form $form): Forms\Form
     {
         return $form->schema([
             Forms\Components\TextInput::make('device_name')
                 ->required(),
-            Forms\Components\TextInput::make('color')
+            Forms\Components\TextInput::make('device_type')
+                ->label('Device Type')
+                ->datalist([
+                    'Gateway',
+                    'Access Points',
+                    'Media Converter',
+                ])
+                ->required(),
+            Forms\Components\ColorPicker::make('color') // Use ColorPicker instead of TextInput
                 ->required()
-                ->maxLength(7) // Assuming hex color
-                ->placeholder('#FFFFFF')
-                ->regex('/^#[0-9A-Fa-f]{6}$/', 'The color must be a valid hex code (e.g., #FFFFFF).'), // Regex validation for hex color
+                ->label('Device Color') // Optional: Add a label
+                ->placeholder('#FFFFFF'), // Optional: Placeholder for HEX value
         ]);
     }
 
@@ -35,8 +52,15 @@ class DeviceModelsResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('device_name')->sortable(), // Corrected class
-                Tables\Columns\TextColumn::make('color')->sortable(), // Corrected class
+                Tables\Columns\TextColumn::make('device_name')
+                    ->sortable()
+                    ->label('Device Name'), // Optional: Add a label
+                Tables\Columns\TextColumn::make('device_name')
+                    ->sortable()
+                    ->label('Device Name'), // Optional: Add a label
+                Tables\Columns\ColorColumn::make('color')
+                    ->label('Color') // Optional: Add a label
+                    ->sortable(), // Allow sorting by color field
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

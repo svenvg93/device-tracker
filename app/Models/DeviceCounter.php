@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class DeviceCounter extends Model
 {
     protected $fillable = [
-        'name',
+        'device_name',
         'device_type',
-        'network',
-        'amount',
+        'device_network',
+        'device_amount',
+        'current_date',
     ];
 
     public function amounts()

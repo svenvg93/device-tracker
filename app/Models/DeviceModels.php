@@ -12,5 +12,6 @@ class DeviceModels extends Model
     protected $fillable = [
         'device_name', // Add this line to allow mass assignment for device_name
         'color', // Ensure this is also included if you have it
+        'device_type',
     ];
 }

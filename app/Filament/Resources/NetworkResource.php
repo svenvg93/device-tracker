@@ -21,6 +21,16 @@ class NetworkResource extends Resource
 
     protected static ?string $navigationGroup = 'Data';
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->is_admin;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()->is_admin;
+    }
+
     public static function form(Forms\Form $form): Forms\Form
     {
         return $form->schema([

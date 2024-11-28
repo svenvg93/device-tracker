@@ -12,7 +12,7 @@ class ResultPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -20,7 +20,7 @@ class ResultPolicy
      */
     public function view(User $user, Result $result): bool
     {
-        return true;
+        return false;
     }
 
     /**

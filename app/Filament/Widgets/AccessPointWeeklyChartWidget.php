@@ -4,88 +4,78 @@ namespace App\Filament\Widgets;
 
 use App\Models\DeviceCounter;
 use App\Models\DeviceModels;
+use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class AccessPointWeeklyChartWidget extends ChartWidget
 {
+    use InteractsWithPageFilters;
+
     protected static ?string $heading = 'Access Points on B2C';
 
     protected int|string|array $columnSpan = 'full';
 
     protected static ?string $maxHeight = '250px';
 
-    public ?string $filter = '6_months';
-
-    protected function getFilters(): ?array
-    {
-        return [
-            'month' => 'Last month',
-            '3_months' => 'Last 3 Months',
-            '6_months' => 'Last 6 Months',
-            'year' => 'Last Year',
-            'all' => 'All Time',
-        ];
-    }
-
+    // Modify getData to use startDate and endDate from filters
     protected function getData(): array
     {
-        // Fetch device amounts based on the selected filter and device_type = 'Gateway'
-        $deviceAmounts = DeviceCounter::query()
-            ->where('device_type', 'Access Point') // Filter by device type
-            ->when($this->filter == 'week', function ($query) {
-                $query->where('created_at', '>=', now()->subWeek());
-            })
-            ->when($this->filter == 'month', function ($query) {
-                $query->where('created_at', '>=', now()->subMonth());
-            })
-            ->when($this->filter == '3_months', function ($query) {
-                $query->where('created_at', '>=', now()->subMonths(3));
-            })
-            ->when($this->filter == '6_months', function ($query) {
-                $query->where('created_at', '>=', now()->subMonths(6));
-            })
-            ->when($this->filter == 'year', function ($query) {
-                $query->where('created_at', '>=', now()->subYear());
-            })
-            ->get()
-            ->groupBy('name'); // Group by device name
+        // Ensure that startDate and endDate are passed as filters, falling back to defaults
+        $startDate = $this->filters['startDate'] ?? now()->subYear();
+        $endDate = $this->filters['endDate'] ?? now();
 
-        // Fetch colors for each device name from the DeviceColor model
+        // Convert dates to the correct timezone without resetting the time
+        $startDate = Carbon::parse($startDate)->timezone(config('app.timezone'));
+        $endDate = Carbon::parse($endDate)->timezone(config('app.timezone'));
+
+        // Fetch data with filtering based on the startDate and endDate
+        $deviceAmounts = DeviceCounter::query()
+            ->where('device_type', 'Access Points')
+            ->whereBetween('current_date', [$startDate, $endDate])
+            ->get()
+            ->groupBy('device_name') // Group by device_name
+            ->sortKeys(); // Sort by device_name alphabetically
+
         $deviceColors = DeviceModels::all()->pluck('color', 'device_name')->toArray();
+
+        // Prepare the date labels (x-axis values)
+        $labels = collect($deviceAmounts)->flatten(1)
+            ->pluck('current_date')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
 
         // Prepare datasets for each device
         $datasets = [];
-        $labels = []; // Initialize an array to hold the labels (dates)
+        foreach ($deviceAmounts as $deviceName => $records) {
+            $data = collect($labels)->map(function ($label) use ($records) {
+                $record = $records->first(fn ($r) => $r->current_date && Carbon::parse($r->current_date)->format('Y-m-d') === $label);
 
-        foreach ($deviceAmounts as $deviceName => $amounts) {
+                return $record ? $record->device_amount : null;
+            });
+
             $datasets[] = [
                 'label' => $deviceName,
-                'data' => $amounts->map(fn ($item) => $item->amount)->values(),
-                'borderColor' => $deviceColors[$deviceName] ?? '#000000', // Default color if not found
-                'backgroundColor' => $deviceColors[$deviceName] ?? '#000000',
-                'pointBackgroundColor' => $deviceColors[$deviceName] ?? '#000000',
-                'fill' => false,
-                'cubicInterpolationMode' => 'monotone',
-                'tension' => 0.4,
+                'data' => $data,
+                'borderColor' => $deviceColors[$deviceName] ?? '#000000', // Color for the line
+                'backgroundColor' => $deviceColors[$deviceName] ?? '#000000', // Color for the fill area
+                'pointBackgroundColor' => $deviceColors[$deviceName] ?? '#000000', // Color for points on the line
+                'fill' => false, // No fill under the line
+                'cubicInterpolationMode' => 'monotone', // Smooth line
+                'tension' => 0.4, // Smoother curve
             ];
-
-            // Collect unique dates for labels
-            foreach ($amounts as $amount) {
-                $date = $amount->created_at->format('Y-m-d'); // Format the date
-                if (! in_array($date, $labels)) {
-                    $labels[] = $date; // Add unique dates
-                }
-            }
         }
-
-        sort($labels); // Sort the labels to ensure the dates are in order
 
         return [
             'datasets' => $datasets,
-            'labels' => $labels, // Use the unique dates for labels
+            'labels' => $labels, // Dates for x-axis
         ];
     }
 
+    // Define chart options
     protected function getOptions(): array
     {
         return [
@@ -116,6 +106,7 @@ class AccessPointWeeklyChartWidget extends ChartWidget
         ];
     }
 
+    // Define chart type
     protected function getType(): string
     {
         return 'line';
