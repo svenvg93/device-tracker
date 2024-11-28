@@ -2,8 +2,8 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Device;
-use App\Models\DeviceColor;
+use App\Models\DeviceCounter;
+use App\Models\DeviceModels;
 use Filament\Widgets\ChartWidget;
 
 class GatewayWeeklyChartWidget extends ChartWidget
@@ -30,7 +30,7 @@ class GatewayWeeklyChartWidget extends ChartWidget
     protected function getData(): array
     {
         // Fetch device amounts based on the selected filter and device_type = 'Gateway'
-        $deviceAmounts = Device::query()
+        $deviceAmounts = DeviceCounter::query()
             ->where('device_type', 'Gateway') // Filter by device type
             ->when($this->filter == 'week', function ($query) {
                 $query->where('created_at', '>=', now()->subWeek());
@@ -42,7 +42,7 @@ class GatewayWeeklyChartWidget extends ChartWidget
             ->groupBy('name'); // Group by device name
 
         // Fetch colors for each device name from the DeviceColor model
-        $deviceColors = DeviceColor::all()->pluck('color', 'device_name')->toArray();
+        $deviceColors = DeviceModels::all()->pluck('color', 'device_name')->toArray();
 
         // Prepare datasets for each device
         $datasets = [];

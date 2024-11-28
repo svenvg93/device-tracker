@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\DeviceResource\Pages;
+namespace App\Filament\Resources\NetworkResource\Pages;
 
-use App\Filament\Resources\DeviceResource;
+use App\Filament\Resources\NetworkResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListDevices extends ListRecords
+class ListNetworks extends ListRecords
 {
-    protected static string $resource = DeviceResource::class;
+    protected static string $resource = NetworkResource::class;
 
     protected function getHeaderActions(): array
     {

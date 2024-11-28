@@ -4,11 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDeviceColorsTable extends Migration
+class CreateDeviceModelsTable extends Migration
 {
     public function up()
     {
-        Schema::create('device_colors', function (Blueprint $table) {
+        Schema::create('device_models', function (Blueprint $table) {
             $table->id();
             $table->string('device_name')->unique(); // Unique device name
             $table->string('color'); // Color hex code

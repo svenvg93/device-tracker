@@ -2,8 +2,8 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Device;
-use App\Models\DeviceColor; // Import the DeviceColor model
+use App\Models\DeviceCounter;
+use App\Models\DeviceModels; // Import the DeviceColor model
 use Filament\Widgets\ChartWidget;
 
 class GatewayDistributionChartWidget extends ChartWidget
@@ -17,7 +17,7 @@ class GatewayDistributionChartWidget extends ChartWidget
     protected function getData(): array
     {
         // Get the last record for each device type
-        $latestDevices = Device::query()
+        $latestDevices = DeviceCounter::query()
             ->where('device_type', 'Gateway')
             ->where('created_at', '>=', now()->subMonths(6))
             ->latest('created_at') // Order by the created_at timestamp
@@ -28,7 +28,7 @@ class GatewayDistributionChartWidget extends ChartWidget
         $deviceAmounts = $latestDevices->pluck('amount', 'name'); // Adjust 'amount' if necessary
 
         // Fetch colors for each device name from the DeviceColor model
-        $deviceColors = DeviceColor::all()->pluck('color', 'device_name')->toArray();
+        $deviceColors = DeviceModels::all()->pluck('color', 'device_name')->toArray();
 
         // Calculate total amount
         $totalAmount = $deviceAmounts->sum();

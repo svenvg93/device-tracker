@@ -2,19 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DeviceColorResource\Pages;
-use App\Models\DeviceColor; // Make sure this model exists
+use App\Filament\Resources\DeviceModelsResource\Pages;
+use App\Models\DeviceModels;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
 
-class DeviceColorResource extends Resource
+class DeviceModelsResource extends Resource
 {
-    protected static ?string $model = DeviceColor::class;
+    protected static ?string $model = DeviceModels::class;
 
-    protected static ?string $navigationLabel = 'Device Colors';
+    protected static ?string $navigationLabel = 'Device Models';
 
-    protected static ?string $navigationIcon = 'heroicon-o-hashtag';
+    protected static ?string $navigationIcon = 'heroicon-s-server';
 
     protected static ?string $navigationGroup = 'Data';
 
@@ -26,7 +26,8 @@ class DeviceColorResource extends Resource
             Forms\Components\TextInput::make('color')
                 ->required()
                 ->maxLength(7) // Assuming hex color
-                ->placeholder('#FFFFFF'),
+                ->placeholder('#FFFFFF')
+                ->regex('/^#[0-9A-Fa-f]{6}$/', 'The color must be a valid hex code (e.g., #FFFFFF).'), // Regex validation for hex color
         ]);
     }
 
@@ -46,9 +47,9 @@ class DeviceColorResource extends Resource
     public static function getPages(): array // Use this method to define pages
     {
         return [
-            'index' => Pages\ListDeviceColors::route('/'),
-            'create' => Pages\CreateDeviceColor::route('/create'),
-            'edit' => Pages\EditDeviceColor::route('/{record}/edit'),
+            'index' => Pages\ListDeviceModels::route('/'),
+            'create' => Pages\CreateDeviceModels::route('/create'),
+            'edit' => Pages\EditDeviceModels::route('/{record}/edit'),
         ];
     }
 }
