@@ -8,31 +8,26 @@ use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
-class AccessPointWeeklyChartWidget extends ChartWidget
+class AccessPointWeeklyBarChartWidget extends ChartWidget
 {
     use InteractsWithPageFilters;
 
-    protected static ?string $heading = 'Access Points on B2C';
+    protected static ?string $heading = 'Total Access Points';
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'half';
 
     protected static ?string $maxHeight = '250px';
 
-    // Modify getData to use startDate and endDate from filters
     protected function getData(): array
     {
-        // Ensure that startDate and endDate are passed as filters, falling back to defaults
         $startDate = $this->filters['startDate'] ?? now()->subWeek();
         $endDate = $this->filters['endDate'] ?? now();
 
-        // Convert dates to the correct timezone without resetting the time
         $startDate = Carbon::parse($startDate)->timezone(config('app.timezone'));
         $endDate = Carbon::parse($endDate)->timezone(config('app.timezone'));
 
-        // Fetch data with filtering based on the startDate and endDate
         $deviceAmounts = DeviceCounter::query()
             ->where('device_type', 'Access Points')
-            ->where('device_network', 'B2C')
             ->whereBetween('current_date', [$startDate, $endDate])
             ->get()
             ->groupBy('device_name') // Group by device_name
@@ -40,7 +35,6 @@ class AccessPointWeeklyChartWidget extends ChartWidget
 
         $deviceColors = DeviceModels::all()->pluck('color', 'device_name')->toArray();
 
-        // Prepare the date labels (x-axis values)
         $labels = collect($deviceAmounts)->flatten(1)
             ->pluck('current_date')
             ->filter()
@@ -49,7 +43,6 @@ class AccessPointWeeklyChartWidget extends ChartWidget
             ->values()
             ->toArray();
 
-        // Prepare datasets for each device
         $datasets = [];
         foreach ($deviceAmounts as $deviceName => $records) {
             $data = collect($labels)->map(function ($label) use ($records) {
@@ -67,6 +60,7 @@ class AccessPointWeeklyChartWidget extends ChartWidget
                 'fill' => false, // No fill under the line
                 'cubicInterpolationMode' => 'monotone', // Smooth line
                 'tension' => 0.4, // Smoother curve
+                'stack' => true,
             ];
         }
 
@@ -106,6 +100,6 @@ class AccessPointWeeklyChartWidget extends ChartWidget
     // Define chart type
     protected function getType(): string
     {
-        return 'line';
+        return 'bar';
     }
 }

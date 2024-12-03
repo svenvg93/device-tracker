@@ -8,6 +8,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 
 class DeviceModelsResource extends Resource
 {
@@ -57,13 +58,22 @@ class DeviceModelsResource extends Resource
                 Tables\Columns\TextColumn::make('device_name')
                     ->sortable()
                     ->label('Device Name'), // Optional: Add a label
-                Tables\Columns\TextColumn::make('device_name')
+                Tables\Columns\TextColumn::make('device_type')
                     ->sortable()
-                    ->label('Device Name'), // Optional: Add a label
+                    ->label('Device Type'), // Optional: Add a label
                 Tables\Columns\ColorColumn::make('color')
                     ->label('Color') // Optional: Add a label
                     ->sortable(), // Allow sorting by color field
             ])
+            ->filters([
+                SelectFilter::make('device_name')
+                    ->multiple()
+                    ->options(DeviceModels::pluck('device_name', 'device_name')->toArray()),
+                SelectFilter::make('device_type')
+                    ->multiple()
+                    ->options(DeviceModels::pluck('device_type', 'device_type')->toArray()),
+            ])
+            ->defaultSort('created_at', 'asc')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

@@ -8,7 +8,7 @@ use Filament\Widgets\ChartWidget;
 
 class AcessPointDistributionChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Latest Access Point Distribution';
+    protected static ?string $heading = 'Current Overall Access Point Distribution';
 
     protected int|string|array $columnSpan = 'half';
 

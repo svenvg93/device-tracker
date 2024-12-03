@@ -2,9 +2,12 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\AccessPointWeeklyBarChartWidget;
 use App\Filament\Widgets\AccessPointWeeklyChartWidget;
 use App\Filament\Widgets\AcessPointDistributionChartWidget;
+use App\Filament\Widgets\DeviceTypeStatsWidget;
 use App\Filament\Widgets\GatewayDistributionChartWidget;
+use App\Filament\Widgets\GatewayWeeklyBarChartWidget;
 use App\Filament\Widgets\GatewayWeeklyChartWidget;
 use App\Forms\Components\DateFilterForm;
 use App\Models\DeviceModels;
@@ -93,6 +96,7 @@ class Dashboard extends BaseDashboard
     protected function getHeaderWidgets(): array
     {
         return [
+            DeviceTypeStatsWidget::make(),
             GatewayDistributionChartWidget::make(),
             AcessPointDistributionChartWidget::make(),
         ];
@@ -101,6 +105,8 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            GatewayWeeklyBarChartWidget::make(),
+            AccessPointWeeklyBarChartWidget::make(),
             GatewayWeeklyChartWidget::make(),
             AccessPointWeeklyChartWidget::make(),
         ];
