@@ -29,11 +29,6 @@ RUN npm ci && npm run build
 # Set permissions for Laravel storage and cache directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Create SQLite database file if it doesn't exist and run migrations
-RUN touch /var/www/html/database/database.sqlite && \
-    php artisan migrate --force && \
-    php artisan db:seed
-
 # Configure Nginx
 COPY ./nginx/laravel.conf /etc/nginx/sites-available/default
 RUN mkdir -p /var/www/html/storage && \
