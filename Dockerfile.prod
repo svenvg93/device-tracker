@@ -1,0 +1,46 @@
+# Use an official PHP runtime as a parent image
+FROM php:8.2-fpm
+
+# Install system dependencies, SQLite extension, Composer, and Node.js (for asset compilation)
+RUN apt-get update && apt-get install -y \
+    libsqlite3-dev \
+    unzip \
+    git \
+    curl \
+    nginx \
+    && docker-php-ext-install pdo_sqlite \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm@latest
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy project files
+COPY . .
+
+# Install PHP dependencies
+RUN composer install --no-interaction --optimize-autoloader --no-dev --no-scripts --ignore-platform-reqs
+
+# Install Node.js dependencies and build assets
+RUN npm install && npm run prod
+
+# Set permissions for Laravel storage and cache directories
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Create SQLite database file if it doesn't exist and run migrations
+RUN touch /var/www/html/database/database.sqlite && \
+    php artisan migrate --force && \
+    php artisan db:seed
+
+# Configure Nginx
+COPY ./nginx/laravel.conf /etc/nginx/sites-available/default
+RUN mkdir -p /var/www/html/storage && \
+    chown -R www-data:www-data /var/www/html/storage
+
+# Expose ports for the web server
+EXPOSE 80
+
+# Start PHP-FPM and Nginx
+CMD service nginx start && php-fpm
