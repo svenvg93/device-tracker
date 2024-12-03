@@ -1,9 +1,12 @@
 name: Build and Push Docker Image to GitHub Packages
 
 on:
-  release:
-    types:
-      - published  # Trigger the action when a release is published
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
