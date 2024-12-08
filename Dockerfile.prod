@@ -1,8 +1,12 @@
 # Use a lighter base image (Alpine)
 FROM php:8.2-fpm-alpine
 
+# Add Alpine repositories if needed
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+
 # Install necessary system dependencies, SQLite extension, Composer, and Node.js
-RUN apk add --no-cache \
+RUN apk update && apk add --no-cache \
     libsqlite3-dev \
     unzip \
     git \
@@ -14,7 +18,7 @@ RUN apk add --no-cache \
     && docker-php-ext-install pdo_sqlite \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && npm install -g npm@latest \
-    && rm -rf /var/cache/apk/*
+    && rm -rf /var/cache/apk/*  # Clean up APK cache to reduce image size
 
 # Set working directory
 WORKDIR /var/www/html
