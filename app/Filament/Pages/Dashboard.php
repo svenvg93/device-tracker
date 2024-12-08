@@ -60,8 +60,7 @@ class Dashboard extends BaseDashboard
                         ->readonly(),
                     DatePicker::make('current_date')
                         ->label('Current Date')
-                        ->default(now()->toDateString())
-                        ->disabled(),
+                        ->default(now()->toDateString()),
                 ])
                 ->action(function (array $data) {
                     \App\Models\DeviceCounter::create([

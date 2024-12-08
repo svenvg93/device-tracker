@@ -68,8 +68,7 @@ class DeviceCounterResource extends Resource
                     ->required(),
                 DatePicker::make('current_date')
                     ->label('Current Date')
-                    ->default(now()->format('d-m-Y'))  // Ensure it's in the correct format
-                    ->readonly(),
+                    ->default(now()->format('d-m-Y')),
             ]);
     }
 

@@ -1,9 +1,9 @@
-# Use a lighter base image (Alpine)
+# Use an Alpine-based PHP runtime as a parent image
 FROM php:8.2-fpm-alpine
 
-# Install necessary system dependencies, SQLite extension, Composer, and Node.js
+# Install system dependencies, SQLite extension, Composer, Node.js, and required PHP extensions
 RUN apk update && apk add --no-cache \
-    libsqlite3-dev \
+    sqlite-dev \
     unzip \
     git \
     curl \
@@ -11,44 +11,37 @@ RUN apk update && apk add --no-cache \
     bash \
     nodejs \
     npm \
-    && docker-php-ext-install pdo_sqlite \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && echo "Installing Composer dependencies..." \
-    && composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-cache \
-    && echo "Installing NPM dependencies..." \
-    && npm ci \
-    && echo "Building assets..." \
-    && npm run build \
-    && echo "Cleaning up..." \
-    && rm -rf /var/cache/apk/* /tmp/*
+    libzip-dev \
+    icu-dev \
+    && docker-php-ext-install pdo_sqlite zip intl \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Set working directory
-WORKDIR /var/www/html
+# Set working directory to /var/www
+WORKDIR /var/www
 
-# Copy only the necessary files (use a .dockerignore to exclude files like node_modules, vendor, etc.)
+# Copy project files into the container
 COPY . .
 
 # Install PHP dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev --no-scripts --ignore-platform-reqs
+RUN composer install \
+    --no-interaction \
+    --prefer-dist \
+    --optimize-autoloader \
+    --no-dev \
+    --no-cache
 
 # Install Node.js dependencies and build assets
 RUN npm ci && npm run build
 
-# Set permissions for Laravel storage and cache directories
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Clean up unnecessary files
+RUN rm -rf /var/cache/apk/* /tmp/*
 
-# Configure Nginx (ensure nginx config file is optimized and minimal)
+# Configure Nginx and expose ports (as needed)
 COPY ./nginx/laravel.conf /etc/nginx/sites-available/default
-RUN mkdir -p /var/www/html/storage && \
-    chown -R www-data:www-data /var/www/html/storage
-
-# Expose ports for the web server
 EXPOSE 8080
 
-# Command to create SQLite database if it doesn't exist, run migrations, and start the server
-CMD bash -c "if [ ! -f /var/www/html/database/database.sqlite ]; then \
-               touch /var/www/html/database/database.sqlite; \
-               fi && \
-               php artisan migrate --force && \
-               php artisan db:seed --force && \
-               php artisan serve --host=0.0.0.0 --port=8080"
+# Set permissions for Laravel storage and cache directories
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
+# Start the server
+CMD ["bash", "-c", "if [ ! -f /var/www/database/database.sqlite ]; then touch /var/www/database/database.sqlite; fi && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=8080"]
