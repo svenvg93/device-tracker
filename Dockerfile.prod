@@ -19,7 +19,7 @@ RUN apk update && apk add --no-cache \
     --no-dev \
     --no-cache && \
     &&   npm ci && npm run build && \
-    && rm -rf /var/cache/apk/*  # Clean up APK cache to reduce image size
+    && rm -rf /var/cache/apk/* 
 
 # Set working directory
 WORKDIR /var/www/html
