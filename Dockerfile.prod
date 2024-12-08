@@ -1,23 +1,25 @@
-# Use an official PHP runtime as a parent image
-FROM php:8.2-fpm
+# Use a lighter base image (Alpine)
+FROM php:8.2-fpm-alpine
 
-# Install system dependencies, SQLite extension, Composer, and Node.js (for asset compilation)
-RUN apt-get update && apt-get install -y \
+# Install necessary system dependencies, SQLite extension, Composer, and Node.js
+RUN apk add --no-cache \
     libsqlite3-dev \
     unzip \
     git \
     curl \
     nginx \
+    bash \
+    nodejs \
+    npm \
     && docker-php-ext-install pdo_sqlite \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm@latest
+    && npm install -g npm@latest \
+    && rm -rf /var/cache/apk/*  # Clean up APK cache to reduce image size
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy project files
+# Copy only the necessary files (use a .dockerignore to exclude files like node_modules, vendor, etc.)
 COPY . .
 
 # Install PHP dependencies
@@ -29,7 +31,7 @@ RUN npm ci && npm run build
 # Set permissions for Laravel storage and cache directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Configure Nginx
+# Configure Nginx (ensure nginx config file is optimized and minimal)
 COPY ./nginx/laravel.conf /etc/nginx/sites-available/default
 RUN mkdir -p /var/www/html/storage && \
     chown -R www-data:www-data /var/www/html/storage
