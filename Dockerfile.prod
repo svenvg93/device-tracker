@@ -12,14 +12,10 @@ RUN apk update && apk add --no-cache \
     nodejs \
     npm \
     && docker-php-ext-install pdo_sqlite \
-    && composer install \
-    --no-interaction \
-    --prefer-dist \
-    --optimize-autoloader \
-    --no-dev \
-    --no-cache && \
-    &&   npm ci && npm run build && \
-    && rm -rf /var/cache/apk/* 
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-cache \
+    && npm ci && npm run build \
+    && rm -rf /var/cache/apk/* /tmp/*
 
 # Set working directory
 WORKDIR /var/www/html
