@@ -13,8 +13,13 @@ RUN apk update && apk add --no-cache \
     npm \
     && docker-php-ext-install pdo_sqlite \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && echo "Installing Composer dependencies..." \
     && composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-cache \
-    && npm ci && npm run build \
+    && echo "Installing NPM dependencies..." \
+    && npm ci \
+    && echo "Building assets..." \
+    && npm run build \
+    && echo "Cleaning up..." \
     && rm -rf /var/cache/apk/* /tmp/*
 
 # Set working directory
