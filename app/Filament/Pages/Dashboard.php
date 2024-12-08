@@ -60,6 +60,7 @@ class Dashboard extends BaseDashboard
                         ->readonly(),
                     DatePicker::make('current_date')
                         ->label('Current Date')
+                        ->native(false)
                         ->default(now()->toDateString()),
                 ])
                 ->action(function (array $data) {
