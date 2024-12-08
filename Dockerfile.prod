@@ -14,7 +14,7 @@ RUN apk add --no-cache \
     && docker-php-ext-install pdo_sqlite \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && npm install -g npm@latest \
-    && rm -rf /var/cache/apk/*  # Clean up APK cache to reduce image size
+    && rm -rf /var/cache/apk/*
 
 # Set working directory
 WORKDIR /var/www/html
